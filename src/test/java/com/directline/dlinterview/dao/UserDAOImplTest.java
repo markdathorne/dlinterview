@@ -1,12 +1,16 @@
 package com.directline.dlinterview.dao;
 
 import com.directline.dlinterview.model.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserDAOImplTest {
+
+    Logger logger = LogManager.getLogger(UserDAOImplTest.class);
 
     UserDAOImpl userDAO = new UserDAOImpl();
     final String user1Email = "abc@email.com";
@@ -16,18 +20,51 @@ class UserDAOImplTest {
     @Test
     void getUser() {
         User user = userDAO.getUser(user1Email);
-        // user should not be null, should be found
-//        assertNotEquals("User is null!", null, user);
-        // user should be user1
-        assertEquals("User is not user:"+user1Email, user.getEmail(), user1Email);
+        logger.info("User:{}", user.toString());
+        /*
+ user should be user1
+        assertFalse(user.getEmail() == user1Email,
+                "User '" + user.getEmail() + "' expected but '" + user2Email + "' found!");
+*/
+        assertSame(user.getEmail(), user1Email,
+                "User '" + user.getEmail() + "' expected but '" + user1Email + "' found!");
     }
 
     @Test
     void updateUser() {
+        int count = userDAO.getDbUsers().size();
+        System.out.println("DB size:" + count);
+
+        final String testDept = "Testing dept";
+        final String testPhone = "0888 888888";
+
+        User userOld = userDAO.getUser(user3Email);
+        System.out.println("User3:" + userOld.toString());
+        User userNew = new User(userOld.getEmail(), userOld.getFullName(), userOld.getPassword(),
+                testPhone, testDept, userOld.getJobTitle());
+        userNew = userDAO.postUser(userNew);
+        System.out.println("User3:" + userNew.toString());
+
+        User user = userDAO.getDbUsers().get(user3Email);
+        System.out.println("User:" + user.toString());
+
+        assertEquals(userDAO.getDbUsers().size(), count, "User count is not the same!");
+
+        assertEquals(user.getDept(), testDept,
+                "User '" + user3Email + "' dept '" + user.getDept()
+                        + "' not updated to '" + testDept + "'!");
+        assertEquals(user.getPhoneNumber(), testPhone,
+                "User " + user3Email + "' phone number '" + user.getPhoneNumber()
+                        + "' not updated to '" + testPhone + "'!");
     }
 
     @Test
     void deleteUser() {
+        int count = userDAO.getDbUsers().size();
+        userDAO.deleteUser(user2Email);
+        assertEquals(userDAO.getDbUsers().size(),  count -1, "User count has reduced by 1");
+        assertFalse(userDAO.getDbUsers().containsKey(user2Email),
+                "Users still contains '" + user2Email +"'!");
     }
 
 
@@ -57,9 +94,9 @@ class UserDAOImplTest {
                 "Marketing",
                 "Sales Manager"
         );
-        userDAO.dbUsers.put(user1.getEmail(), user1);
-        userDAO.dbUsers.put(user2.getEmail(), user2);
-        userDAO.dbUsers.put(user3.getEmail(), user3);
+        userDAO.getDbUsers().put(user1.getEmail(), user1);
+        userDAO.getDbUsers().put(user2.getEmail(), user2);
+        userDAO.getDbUsers().put(user3.getEmail(), user3);
     }
 
 }

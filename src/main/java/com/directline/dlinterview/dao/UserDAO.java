@@ -4,9 +4,9 @@ import com.directline.dlinterview.model.User;
 
 public interface UserDAO {
 
-    public User getUser(String email);
+    User getUser(String email);
 
-    public void postUser(User user);
+    User postUser(User user);
 
-    public boolean deleteUser(String email);
+    User deleteUser(String email);
 }

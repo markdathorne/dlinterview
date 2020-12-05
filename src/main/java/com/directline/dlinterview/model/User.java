@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter @Setter @ToString
 public class User {
   // unique id (key) is email
@@ -13,6 +15,8 @@ public class User {
   private String phoneNumber;
   private String dept;
   private String jobTitle;
+  private LocalDateTime lastUpdated;
+  private String message;
 
   // construct new User
   public User(String email, String fullName, String password, String phoneNumber,
@@ -23,6 +27,8 @@ public class User {
     this.phoneNumber = phoneNumber;
     this.dept = dept;
     this.jobTitle = jobTitle;
+    this.lastUpdated = LocalDateTime.now();
+    this.message = "";
   }
 
 }
